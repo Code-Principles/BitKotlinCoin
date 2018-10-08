@@ -17,12 +17,4 @@ object Utils {
 
         return result.toString()
     }
-
-    fun MutableList<Block>.addNewBlock(data: String? = null) {
-        this.add(Block(size,
-                last().hash(),
-                System.currentTimeMillis() / 1000,
-                data))
-    }
-
 }

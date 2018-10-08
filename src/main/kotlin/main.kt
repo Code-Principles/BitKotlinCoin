@@ -1,4 +1,3 @@
-import Utils.addNewBlock
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.html.respondHtml
@@ -9,22 +8,13 @@ import io.ktor.server.netty.Netty
 import kotlinx.html.body
 import kotlinx.html.p
 
-private val blockChain = mutableListOf<Block>().also {
-    it.add(
-            Block(
-                    0,
-                    Utils.sha256("0"),
-                    System.currentTimeMillis() / 1000,
-                    null
-            )
-    )
-}
+
 
 fun main(args: Array<String>) {
     embeddedServer(
             Netty,
             watchPaths = listOf("./"),
-            port = 3000,
+            port = 3001,
             module = Application::myModule
     ).start(true)
 }
@@ -34,17 +24,30 @@ fun Application.myModule() {
         get("/") {
             call.respondHtml {
                 body {
-                    blockChain.forEach {
+                    BlockChain.get().forEach {
                         p { text(it.toString()) }
                     }
                 }
             }
         }
         get("/add") {
-            blockChain.addNewBlock()
+            BlockChain.addNewBlock()
             call.respondHtml {
                 body {
                     p { text("Added block to block chain! :D") }
+                }
+            }
+        }
+        get("/isValid") {
+            call.respondHtml {
+                body {
+                    p {
+                        text("The chain is " +
+                                if (BlockChain.isValid(BlockChain.get()))
+                                    "valid"
+                                else
+                                    "invalid")
+                    }
                 }
             }
         }
